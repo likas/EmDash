@@ -10,7 +10,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "EmDashPlayerState.h"
+#include "AbilitySystemComponent.h"
 #include "EmDash.h"
+#include "Kismet/GameplayStatics.h"
 
 AEmDashCharacter::AEmDashCharacter()
 {
@@ -48,6 +51,22 @@ AEmDashCharacter::AEmDashCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AEmDashCharacter::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+	
+#if !UE_BUILD_SHIPPING
+	UWorld* World = GetWorld();
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if(IsLocallyControlled())
+	{
+		UE_LOG(LogEmDash, Log, TEXT("Calling command on a local controller"));
+		UKismetSystemLibrary::ExecuteConsoleCommand(World, TEXT("ShowDebug AbilitySystem"), PlayerController);
+	}
+
+#endif // !UE_BUILD_SHIPPING
 }
 
 void AEmDashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -130,4 +149,37 @@ void AEmDashCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+UAbilitySystemComponent* AEmDashCharacter::GetAbilitySystemComponent() const
+{
+	return GetPlayerState<AEmDashPlayerState>() ? GetPlayerState<AEmDashPlayerState>()->GetAbilitySystemComponent() : nullptr;
+}
+
+void AEmDashCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Initialize the Ability System Component for the player state
+	if (AEmDashPlayerState* PS = GetPlayerState<AEmDashPlayerState>())
+	{
+		if (UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent())
+		{
+			ASC->InitAbilityActorInfo(PS, this);
+		}
+	}
+}
+
+void AEmDashCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Initialize the Ability System Component for the player state
+	if (AEmDashPlayerState* PS = GetPlayerState<AEmDashPlayerState>())
+	{
+		if (UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent())
+		{
+			ASC->InitAbilityActorInfo(PS, this);
+		}
+	}
 }

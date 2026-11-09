@@ -18,7 +18,10 @@ public class EmDash : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
@@ -37,7 +40,8 @@ public class EmDash : ModuleRules
 			"EmDash/Variant_SideScrolling/AI",
 			"EmDash/Variant_SideScrolling/Gameplay",
 			"EmDash/Variant_SideScrolling/Interfaces",
-			"EmDash/Variant_SideScrolling/UI"
+			"EmDash/Variant_SideScrolling/UI",
+			"EmDash/AbilitySystem",
 		});
 
 		// Uncomment if you are using Slate UI

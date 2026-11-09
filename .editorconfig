@@ -1,0 +1,8 @@
+# Epic C++ coding standard: indent with tabs, tab size 4.
+# Read by Visual Studio, Rider and GitHub; VS Code needs the EditorConfig extension.
+root = true
+
+[*.{h,cpp,inl,cs,uproject,uplugin}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
